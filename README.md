@@ -4,7 +4,7 @@
 This library is a C++ implementation of the Exdir specification for storing data.
 Exdir is methodology of organizing and storing data, which is meant to replace 
 HDF5. As with HDF5, data is stored in a heirarchy, but instead of using a single 
-binary file, Exdir used the filesystem of the users computer to establish this 
+binary file, Exdir uses the filesystem of the users computer to establish this 
 heirarchy. Within an Exdir file (which is just a folder on your computer), there
 can be Groups, Datasets, or Raws. Groups are used to categorize information, and
 groups may be nested within one antoher, and one group may have multiple other
