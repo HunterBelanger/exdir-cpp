@@ -1,4 +1,6 @@
 # Exdir for C++
+![License](https://img.shields.io/github/license/HunterBelanger/exdir-cpp.svg)
+
 This library is a C++ implementation of the Exdir specification for storing data.
 Exdir is methodology of organizing and storing data, which is meant to replace 
 HDF5. As with HDF5, data is stored in a heirarchy, but instead of using a single 
