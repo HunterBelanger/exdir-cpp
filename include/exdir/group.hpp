@@ -40,7 +40,7 @@ class Group : public Object {
 
       // Write data to data.npy
       write_npy(path_ / name / "data.npy",
-                reinterpret_cast<const char*>(data.data_pointer()), data.size(),
+                reinterpret_cast<const char*>(data.data_pointer()),
                 data.shape(), data.dtype(), data.c_contiguous());
 
     } else {

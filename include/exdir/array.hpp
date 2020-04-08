@@ -22,11 +22,39 @@ class Array {
   // Access data with linear index.
   T& operator[](size_t i);
 
-  // Access data with array indicies.
+  // Access data with array indicies passed as a vector.
   T& operator()(std::vector<size_t> indicies);
+
+  // Access data with array idicies.
+  template <typename IND, typename... INDS>
+  T& operator()(IND ind0, INDS... inds) {
+    std::vector<size_t> indicies{static_cast<size_t>(ind0),
+                                 static_cast<size_t>(inds)...};
+    if (indicies.size() != shape_.size()) {
+      std::string mssg =
+          "Improper number of indicies provided to exdir::Array.";
+      throw std::runtime_error(mssg);
+    } else {
+      size_t indx;
+      if (c_contiguous_) {
+        // Get linear index for row-major order
+        indx = c_contiguous_index(indicies);
+      } else {
+        // Get linear index for column-major order
+        indx = fortran_contiguous_index(indicies);
+      }
+      return data_[indx];
+    }
+  }
 
   // Returns a vector describing the shape of the array.
   std::vector<size_t> shape() const;
+
+  // Reshapes the array to the prescribed shape, provided as a vector of
+  // size_t type values. If the reshape is possible, the function returns
+  // true, and the shape is modified. If the provided shape is not compatible
+  // with the current data, the shape is not changed and false is returned.
+  bool reshape(std::vector<size_t> new_shape);
 
   // Returns the number of elements in the array.
   size_t size() const;

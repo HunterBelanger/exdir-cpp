@@ -2,40 +2,8 @@
 
 namespace exdir {
 
-bool system_is_little_endian() {
-  int x = 1;
-
-  if (((char*)&x)[0] == 0x01)
-    return true;
-  else
-    return false;
-}
-
-void swap_bytes(char* data, uint64_t n_elements, size_t element_size) {
-  // Calculate number of total bytes
-  uint64_t number_of_bytes = n_elements * element_size;
-
-  // Iterate through all elements, and swap their bytes
-  for (uint64_t i = 0; i < number_of_bytes; i += element_size) {
-    if (element_size == 1) {
-      // Nothing to do
-    } else if (element_size == 2) {
-      swap_two_bytes(data + i);
-    } else if (element_size == 4) {
-      swap_four_bytes(data + i);
-    } else if (element_size == 8) {
-      swap_eight_bytes(data + i);
-    } else {
-      std::string mssg = "Cannot swap bytes for data types of size " +
-                         std::to_string(element_size);
-      throw std::runtime_error(mssg);
-    }
-  }
-}
-
-std::vector<size_t> load_npy(std::filesystem::path fpath, char*& data_ptr,
-                             uint64_t& n_elements, DType& dtype,
-                             bool& c_contiguous) {
+void load_npy(std::filesystem::path fpath, char*& data_ptr,
+              std::vector<size_t>& shape, DType& dtype, bool& c_contiguous) {
   // Open file
   std::ifstream file(fpath);
 
@@ -132,7 +100,9 @@ std::vector<size_t> load_npy(std::filesystem::path fpath, char*& data_ptr,
   loc1 = header.find('(');
   size_t loc2 = header.find(')');
   loc1 += 1;
-  std::vector<size_t> shape;
+  // Clear shape vector to ensure it's empty (even though it should already be
+  // empty)
+  shape.clear();
   if (loc1 == loc2) {
     shape.push_back(1);
   } else {
@@ -153,7 +123,7 @@ std::vector<size_t> load_npy(std::filesystem::path fpath, char*& data_ptr,
   }
 
   // Get number of bytes to be read into system
-  n_elements = shape[0];
+  uint64_t n_elements = shape[0];
   for (size_t j = 1; j < shape.size(); j++) n_elements *= shape[j];
   uint64_t n_bytes_to_read = n_elements * element_size;
   char* data = new char[n_bytes_to_read];
@@ -171,13 +141,17 @@ std::vector<size_t> load_npy(std::filesystem::path fpath, char*& data_ptr,
   delete[] magic_string;
   delete[] header_char;
   file.close();
-
-  return shape;
 }
 
 void write_npy(std::filesystem::path fpath, const char* data_ptr,
-               uint64_t n_elements, std::vector<size_t> shape, DType dtype,
-               bool c_contiguous) {
+               std::vector<size_t> shape, DType dtype, bool c_contiguous) {
+  // Calculate number of elements from the shape
+  uint64_t n_elements = shape[0];
+  for (size_t j = 1; j < shape.size(); j++) {
+    n_elements *= shape[j];
+  }
+
+  // Open file
   std::ofstream file(fpath);
 
   // First write magic string
@@ -328,6 +302,37 @@ size_t size_of_DType(DType dtype) {
   else {
     std::string mssg = "Unknown DType identifier.";
     throw std::runtime_error(mssg);
+  }
+}
+
+bool system_is_little_endian() {
+  int x = 1;
+
+  if (((char*)&x)[0] == 0x01)
+    return true;
+  else
+    return false;
+}
+
+void swap_bytes(char* data, uint64_t n_elements, size_t element_size) {
+  // Calculate number of total bytes
+  uint64_t number_of_bytes = n_elements * element_size;
+
+  // Iterate through all elements, and swap their bytes
+  for (uint64_t i = 0; i < number_of_bytes; i += element_size) {
+    if (element_size == 1) {
+      // Nothing to do
+    } else if (element_size == 2) {
+      swap_two_bytes(data + i);
+    } else if (element_size == 4) {
+      swap_four_bytes(data + i);
+    } else if (element_size == 8) {
+      swap_eight_bytes(data + i);
+    } else {
+      std::string mssg = "Cannot swap bytes for data types of size " +
+                         std::to_string(element_size);
+      throw std::runtime_error(mssg);
+    }
   }
 }
 

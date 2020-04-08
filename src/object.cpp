@@ -29,7 +29,7 @@ Object::Object(std::filesystem::path i_path) : path_{i_path} {
 
   // Check if attributes.yaml exists. If so, load into attributes
   if (std::filesystem::exists(path_ / "attributes.yaml")) {
-    attributes = YAML::LoadFile(path_ / "attributes.yaml");
+    attrs = YAML::LoadFile(path_ / "attributes.yaml");
   }
 }
 
@@ -62,7 +62,7 @@ bool Object::is_raw() const {
 }
 
 bool Object::has_attributes() const {
-  if (attributes.IsNull())
+  if (attrs.IsNull())
     return false;
   else
     return true;
@@ -78,9 +78,9 @@ bool Object::operator==(const Object& obj) const {
 
 void Object::write() {
   // Write attributes to file
-  if (!attributes.IsNull()) {
+  if (!attrs.IsNull()) {
     std::ofstream attributes_yaml(path_ / "attributes.yaml");
-    attributes_yaml << attributes;
+    attributes_yaml << attrs;
     attributes_yaml.close();
   }
 }

@@ -43,7 +43,8 @@ class Object {
   // Writes the attribues of object to disk.
   void write();
 
-  YAML::Node attributes;
+  // YAML Node with attributes for object.
+  YAML::Node attrs;
 
  protected:
   Object(std::filesystem::path i_path);

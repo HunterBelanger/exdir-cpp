@@ -70,6 +70,21 @@ std::vector<size_t> Array<T>::shape() const {
 }
 
 template <class T>
+bool Array<T>::reshape(std::vector<size_t> new_shape) {
+  uint64_t new_n_elements = new_shape[0];
+  for (size_t i = 1; i < new_shape.size(); i++) {
+    new_n_elements *= new_shape[i];
+  }
+
+  if (new_n_elements == n_elements_) {
+    shape_ = new_shape;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+template <class T>
 size_t Array<T>::size() const {
   return n_elements_;
 }

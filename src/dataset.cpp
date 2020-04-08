@@ -65,8 +65,7 @@ void Dataset::create_raw(std::string name) {
 }
 
 void Dataset::load_data() {
-  shape_ =
-      load_npy((path_ / "data.npy"), data_, n_elements_, dtype_, c_contiguous_);
+  load_npy((path_ / "data.npy"), data_, shape_, dtype_, c_contiguous_);
   element_size_ = size_of_DType(dtype_);
 }
 
@@ -87,13 +86,13 @@ bool Dataset::data_loaded() const {
 template <class T>
 void Dataset::write(Array<T> data) {
   write_npy(path_ / "data.npy",
-            reinterpret_cast<const char*>(data.data_pointer()), data.size(),
-            data.shape(), data.dtype(), data.c_contiguous());
+            reinterpret_cast<const char*>(data.data_pointer()), data.shape(),
+            data.dtype(), data.c_contiguous());
 
   // Write attributes as well
-  if (!attributes.IsNull()) {
+  if (!attrs.IsNull()) {
     std::ofstream attributes_yaml(path_ / "attributes.yaml");
-    attributes_yaml << attributes;
+    attributes_yaml << attrs;
     attributes_yaml.close();
   }
 }

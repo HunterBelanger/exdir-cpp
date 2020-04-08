@@ -13,5 +13,9 @@ int main() {
 
   group1.create_dataset("data_set_1", test_array);
 
+  for(int i = 0 ; i < 5; i++) {
+    std::cout << test_array(i) << "\n";
+  }
+
   return 0;
 }
