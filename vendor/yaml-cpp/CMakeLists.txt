@@ -41,20 +41,40 @@ set_target_properties(yaml-cpp PROPERTIES PUBLIC_HEADER "${YAML_CPP_HEADER_FILES
 
 set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE 1)
 
-add_library(yaml-cpp_shared SHARED $<TARGET_OBJECTS:yaml-cpp>)
-add_library(yaml-cpp_static STATIC $<TARGET_OBJECTS:yaml-cpp>)
+if(BUILD_SHARED)
+	add_library(yaml-cpp_shared SHARED $<TARGET_OBJECTS:yaml-cpp>)
+	set_target_properties(yaml-cpp_shared PROPERTIES OUTPUT_NAME yaml-cpp)
+endif()
 
-set_target_properties(yaml-cpp_shared PROPERTIES OUTPUT_NAME yaml-cpp)
-set_target_properties(yaml-cpp_static PROPERTIES OUTPUT_NAME yaml-cpp)
+if(BUILD_STATIC)
+	add_library(yaml-cpp_static STATIC $<TARGET_OBJECTS:yaml-cpp>)
+	set_target_properties(yaml-cpp_static PROPERTIES OUTPUT_NAME yaml-cpp)
+endif()
 
-install(TARGETS yaml-cpp_shared yaml-cpp_static
-				LIBRARY
-					DESTINATION lib
-					COMPONENT Libraries
-					NAMELINK_COMPONENT Development
-				PUBLIC_HEADER
-					DESTINATION include
-					COMPONENT Development
-)
+if(NOT MSVC)
+	if(BUILD_SHARED)
+		install(TARGETS yaml-cpp_shared
+						LIBRARY
+							DESTINATION lib
+							COMPONENT Libraries
+							NAMELINK_COMPONENT Development
+						PUBLIC_HEADER
+							DESTINATION include
+							COMPONENT Development
+		)
+	endif()
 
-install(DIRECTORY "include/yaml-cpp" DESTINATION include)
+	if(BUILD_STATIC)
+		install(TARGETS yaml-cpp_static
+						LIBRARY
+							DESTINATION lib
+							COMPONENT Libraries
+							NAMELINK_COMPONENT Development
+						PUBLIC_HEADER
+							DESTINATION include
+							COMPONENT Development
+		)
+	endif()
+
+	install(DIRECTORY "include/yaml-cpp" DESTINATION include)
+endif()

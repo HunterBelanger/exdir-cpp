@@ -3,6 +3,18 @@ project(exdir CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(MSVC)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+  set(BUILD_STATIC OFF CACHE BOOL "Build static lib")
+  set(BUILD_SHARED ON CACHE BOOL "Build shared lib")
+elseif(BUILD_SHARED_LIBS)
+  set(BUILD_STATIC OFF CACHE BOOL "Build static lib")
+  set(BUILD_SHARED ON CACHE BOOL "Build shared lib")
+else()
+  set(BUILD_STATIC ON CACHE BOOL "Build static lib")
+  set(BUILD_SHARED ON CACHE BOOL "Build shared lib") 
+endif()
+
 include_directories(include vendor/yaml-cpp/include)
 
 set(EXDIR_SOURCE_FILES ${EXDIR_SOURCE_FILES}
@@ -31,28 +43,51 @@ set_target_properties(exdir PROPERTIES PUBLIC_HEADER "${EXDIR_HEADER_FILES}")
 
 set_property(TARGET exdir PROPERTY POSITION_INDEPENDENT_CODE 1)
 
-add_library(exdir_shared SHARED $<TARGET_OBJECTS:exdir>)
-add_library(exdir_static STATIC $<TARGET_OBJECTS:exdir>)
-
 add_subdirectory(vendor/yaml-cpp)
 
-target_link_libraries(exdir_shared PUBLIC yaml-cpp_shared)
-target_link_libraries(exdir_static PUBLIC yaml-cpp_static)
+if(BUILD_SHARED)
+  add_library(exdir_shared SHARED $<TARGET_OBJECTS:exdir>)
+  target_link_libraries(exdir_shared PUBLIC yaml-cpp_shared)
+  set_target_properties(exdir_shared PROPERTIES OUTPUT_NAME exdir)
+endif()
 
-set_target_properties(exdir_shared PROPERTIES OUTPUT_NAME exdir)
-set_target_properties(exdir_static PROPERTIES OUTPUT_NAME exdir)
+if(BUILD_STATIC)
+  add_library(exdir_static STATIC $<TARGET_OBJECTS:exdir>)
+  target_link_libraries(exdir_static PUBLIC yaml-cpp_static)
+  set_target_properties(exdir_static PROPERTIES OUTPUT_NAME exdir)
+endif()
 
 add_executable(test example/main.cpp)
-target_link_libraries(test PUBLIC exdir_shared)
+if(BUILD_SHARED)
+  target_link_libraries(test PUBLIC exdir_shared)
+else()
+  target_link_libraries(test PUBLIC exdir_static)
+endif()
 
-install(TARGETS exdir_shared exdir_static
-        LIBRARY
-          DESTINATION lib
-          COMPONENT Libraries
-          NAMELINK_COMPONENT Development
-        PUBLIC_HEADER
-          DESTINATION include
-          COMPONENT Development
-)
+if(NOT MSVC)
+  if(BUILD_SHARED)
+    install(TARGETS exdir_shared
+            LIBRARY
+              DESTINATION lib
+              COMPONENT Libraries
+              NAMELINK_COMPONENT Development
+            PUBLIC_HEADER
+              DESTINATION include
+              COMPONENT Development
+    )
+  endif()
 
-install(DIRECTORY "include/exdir" DESTINATION include)
+  if(BUILD_STATIC)
+    install(TARGETS exdir_static
+            LIBRARY
+              DESTINATION lib
+              COMPONENT Libraries
+              NAMELINK_COMPONENT Development
+            PUBLIC_HEADER
+              DESTINATION include
+              COMPONENT Development
+    )
+  endif()
+
+  install(DIRECTORY "include/exdir" DESTINATION include)
+endif()
