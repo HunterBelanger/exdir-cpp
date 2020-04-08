@@ -5,10 +5,10 @@ namespace exdir {
 Object::Object(std::filesystem::path i_path) : path_{i_path} {
   // Check if exdir.yaml exists, if so, load into exdir_info
   if (std::filesystem::exists(path_ / "exdir.yaml")) {
-    exdir_info = YAML::LoadFile(path_ / "exdir.yaml");
+    exdir_info = YAML::LoadFile((path_ / "exdir.yaml").string());
 
     // Set data type from exdir.yaml
-    if (exdir_info["exdir"] and exdir_info["exdir"]["type"]) {
+    if (exdir_info["exdir"] && exdir_info["exdir"]["type"]) {
       if (exdir_info["exdir"]["type"].as<std::string>() == "file")
         type_ = Type::File;
       else if (exdir_info["exdir"]["type"].as<std::string>() == "group")
@@ -29,7 +29,7 @@ Object::Object(std::filesystem::path i_path) : path_{i_path} {
 
   // Check if attributes.yaml exists. If so, load into attributes
   if (std::filesystem::exists(path_ / "attributes.yaml")) {
-    attrs = YAML::LoadFile(path_ / "attributes.yaml");
+    attrs = YAML::LoadFile((path_ / "attributes.yaml").string());
   }
 }
 
@@ -41,7 +41,7 @@ bool Object::is_file() const {
 }
 
 bool Object::is_group() const {
-  if (type_ == Type::Group or type_ == Type::File)
+  if (type_ == Type::Group || type_ == Type::File)
     return true;
   else
     return false;

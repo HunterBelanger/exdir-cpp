@@ -14,9 +14,10 @@ Group::Group(std::filesystem::path i_path) : Object{i_path} {
     if (std::filesystem::is_directory(f.status())) {
       // Is a directory, check if exdir.yaml exists
       if (std::filesystem::exists(f.path() / "exdir.yaml")) {
-        YAML::Node daughter_node = YAML::LoadFile(f.path() / "exdir.yaml");
+        YAML::Node daughter_node =
+            YAML::LoadFile((f.path() / "exdir.yaml").string());
 
-        if (daughter_node["exdir"] and daughter_node["exdir"]["type"]) {
+        if (daughter_node["exdir"] && daughter_node["exdir"]["type"]) {
           // f.path() yields /dir/to/parent/current_node/daughter_node
           // Using f.path().filename() yields daughter_node as path
           std::string node_name = f.path().filename().string();

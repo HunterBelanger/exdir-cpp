@@ -55,7 +55,4 @@ install(TARGETS exdir_shared exdir_static
           COMPONENT Development
 )
 
-install(TARGETS exdir
-        PUBLIC_HEADER
-          DESTINATION include/exdir
-)
+install(DIRECTORY "include/exdir" DESTINATION include)
