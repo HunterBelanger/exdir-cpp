@@ -52,10 +52,21 @@ struct node_iterator_type<const V> {
 };
 
 template <typename V>
-class node_iterator_base
-    : public std::iterator<std::forward_iterator_tag, node_iterator_value<V>,
+class node_iterator_base {
+    // Removed by HunterBelanger 08/04/2020
+    /*: public std::iterator<std::forward_iterator_tag, node_iterator_value<V>,
                            std::ptrdiff_t, node_iterator_value<V>*,
-                           node_iterator_value<V>> {
+                           node_iterator_value<V>> {*/
+ 
+ // Added by HunterBelanger 08/04/2020 ========================================
+ public:
+   typedef std::forward_iterator_tag iterator_category;
+   // value_type typedef was already provided bellow
+   typedef std::ptrdiff_t difference_type;
+   typedef node_iterator_value<V>* pointer;
+   typedef node_iterator_value<V> reference;
+ // ===========================================================================
+
  private:
   struct enabler {};
 

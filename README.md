@@ -55,9 +55,11 @@ be specified with the usual ```-DCMAKE_INSTALL_PREFIX=/dir/to/install``` flag
 with the cmake command.
 
 ## Notice
-This library uses yaml-cpp, which is already provided in the vendor directory. 
-The github repository for yaml-cpp is located 
+This library uses yaml-cpp (version 0.6.3), which is already provided in the 
+vendor directory. The github repository for yaml-cpp is located 
 [here](https://github.com/jbeder/yaml-cpp). It is a great piece of software 
-which I recomend users take a look at. No changes have been made to the source,
-just changes to the cmake to simplify the build for the purposes of this
-project.
+which I recomend users take a look at. The only changes which have been made
+were a small change to the source in 
+```vendor\yaml-cpp\include\yaml-cpp\node\detail\node_iterator.h``` at line 56
+to comply with the C++17 standard (and to make Visual Studio warnings go away), 
+and the cmake, to simplify the build process.

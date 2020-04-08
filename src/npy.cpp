@@ -199,13 +199,13 @@ void write_npy(std::filesystem::path fpath, const char* data_ptr,
 
   // Inf for len of header
   if (major_version == 0x01) {
-    uint16_t len = header.size();
+    uint16_t len = static_cast<uint16_t>(header.size());
     if (!system_is_little_endian()) {
       swap_two_bytes((char*)&len);
     }
     file << ((char*)&len)[0] << ((char*)&len)[1];
   } else {
-    uint32_t len = header.size();
+    uint32_t len = static_cast<uint32_t>(header.size());
     if (!system_is_little_endian()) {
       swap_four_bytes((char*)&len);
     }
