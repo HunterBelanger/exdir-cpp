@@ -49,6 +49,8 @@ class Dataset : public Object {
   template <class T>
   void write(Array<T> data);
 
+  DType dtype() const;
+
   exdir::Raw get_raw(std::string) const;
   std::vector<std::string> member_raws() const;
 

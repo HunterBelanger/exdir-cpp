@@ -97,6 +97,8 @@ void Dataset::write(Array<T> data) {
   }
 }
 
+DType Dataset::dtype() const {return dtype_;}
+
 Raw Dataset::get_raw(std::string name) const {
   // Make sure in raws_
   for (const auto& raw : raws_) {
