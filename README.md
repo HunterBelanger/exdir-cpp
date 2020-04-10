@@ -26,9 +26,40 @@ still change. Once this project reaches a more stable state, this warning will
 be removed.
 
 ## Usage
-A brief example program is provided in the ```example``` directory, and is 
-compiled with the libraries. You can take a look at this to get a brief idea of
-how it works. I will be writting more documentation soon.
+Here is a brief example of exdir-cpp in action
+```cpp
+#include<exdir/exdir.hpp>
+
+int main() {
+
+  exdir::File file = exdir::create_file("test.exdir");
+
+  file.create_group("group1");
+
+  exdir::Group group1 = file.get_group("group1");
+
+  std::vector<int> test_data { 1,  2,  3,  4,
+                               5,  6,  7,  8,
+                               9, 10, 11, 12,
+                              13, 14, 15, 16};
+
+  exdir::Array test_array(test_data, {4,4}, exdir::DType::INT64);
+
+  test_array.reshape({4,2,2});
+
+  group1.create_dataset("data_set_1", test_array);
+
+  exdir::Dataset dset_1 = group1.get_dataset("data_set_1");
+
+  dset_1.attrs["density"] = 12.4;
+
+  dset_1.write();
+
+  return 0;
+}
+```
+A more in-depth explination of the classes and usage is given in the wiki 
+[here](https://github.com/HunterBelanger/exdir-cpp/wiki/Usage).
 
 ## Install
 All that is required to build exdir-cpp is a C++ compiler capable of the C++17

@@ -8,14 +8,16 @@ int main() {
 
   exdir::Group group1 = file.get_group("group1");
 
-  std::vector<double> test_data {1.0, 2.0, 3.0, 4.0, 5.0};
-  exdir::Array test_array(test_data, {5}, exdir::DType::DOUBLE64);
+  std::vector<int> test_data { 1,  2,  3,  4,
+                               5,  6,  7,  8,
+                               9, 10, 11, 12,
+                              13, 14, 15, 16};
+
+  exdir::Array test_array(test_data, {4,4}, exdir::DType::INT64);
+
+  test_array.reshape({4,2,2});
 
   group1.create_dataset("data_set_1", test_array);
-
-  for(int i = 0 ; i < 5; i++) {
-    std::cout << test_array(i) << "\n";
-  }
 
   return 0;
 }
