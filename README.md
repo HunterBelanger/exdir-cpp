@@ -38,7 +38,7 @@ int main() {
 
   test_array.reshape({4,2,2});
 
-  exdir::Dataset dset_1 group1.create_dataset("data_set_1", test_array);
+  exdir::Dataset<int> dset_1 group1.create_dataset<int>("data_set_1", test_array);
 
   dset_1.attrs["density"] = 12.4;
 
@@ -54,8 +54,8 @@ A more in-depth explination of the classes and usage is given in the wiki
 
 ## Dependencies
 This package is dependent on the [yaml-cpp](https://github.com/jbeder/yaml-cpp)
-library, to handel all interactions with the ```.yaml``` file. It is present in
-most distro's repositories, and can usually be installed with your system's
+library, to handle all interactions with the ```.yaml``` files. It is present in
+most distros repositories, and can usually be installed with your system's
 package manager.
 
 * **Ubuntu / Linux Mint :**
