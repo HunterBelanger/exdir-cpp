@@ -1,4 +1,4 @@
-#include "exdir/npy.hpp"
+#include "npy.hpp"
 
 namespace exdir {
 
@@ -245,6 +245,10 @@ DType descr_to_DType(std::string dtype) {
     return DType::FLOAT32;
   else if (dtype == "f8")
     return DType::DOUBLE64;
+  else if (dtype == "c8")
+    return DType::COMPLEX64;
+  else if (dtype == "c16")
+    return DType::COMPLEX128;
   else {
     std::string mssg = "Data type " + dtype + " is unknown.";
     throw std::runtime_error(mssg);
@@ -272,6 +276,10 @@ std::string DType_to_descr(DType dtype) {
     return "f4";
   else if (dtype == DType::DOUBLE64)
     return "f8";
+  else if (dtype == DType::COMPLEX64)
+    return "c8";
+  else if (dtype == DType::COMPLEX128)
+    return "c16";
   else {
     std::string mssg = "Unknown DType identifier.";
     throw std::runtime_error(mssg);
@@ -299,6 +307,10 @@ size_t size_of_DType(DType dtype) {
     return 4;
   else if (dtype == DType::DOUBLE64)
     return 8;
+  else if (dtype == DType::COMPLEX64)
+    return 8;
+  else if (dtype == DType::COMPLEX128)
+    return 16;
   else {
     std::string mssg = "Unknown DType identifier.";
     throw std::runtime_error(mssg);
@@ -322,12 +334,14 @@ void swap_bytes(char* data, uint64_t n_elements, size_t element_size) {
   for (uint64_t i = 0; i < number_of_bytes; i += element_size) {
     if (element_size == 1) {
       // Nothing to do
-    } else if (element_size == 2) {
+    } else if(element_size == 2) {
       swap_two_bytes(data + i);
-    } else if (element_size == 4) {
+    } else if(element_size == 4) {
       swap_four_bytes(data + i);
-    } else if (element_size == 8) {
+    } else if(element_size == 8) {
       swap_eight_bytes(data + i);
+    } else if(element_size == 16) {
+      swap_sixteen_bytes(data+i);
     } else {
       std::string mssg = "Cannot swap bytes for data types of size " +
                          std::to_string(element_size);
@@ -378,6 +392,32 @@ void swap_eight_bytes(char* bytes) {
   bytes[5] = temp[2];
   bytes[6] = temp[1];
   bytes[7] = temp[0];
+}
+
+void swap_sixteen_bytes(char* bytes) {
+  // Temporary array to store original bytes
+  char temp[16];
+
+  // Copyr original bytes into temp array
+  std::memcpy(&temp, bytes, 16);
+
+  // Set original bytes to new values
+  bytes[0] = temp[15];
+  bytes[1] = temp[14];
+  bytes[2] = temp[13];
+  bytes[3] = temp[12];
+  bytes[4] = temp[11];
+  bytes[5] = temp[10];
+  bytes[6] = temp[9];
+  bytes[7] = temp[8];
+  bytes[8] = temp[7];
+  bytes[9] = temp[6];
+  bytes[10] = temp[5];
+  bytes[11] = temp[4];
+  bytes[12] = temp[3];
+  bytes[13] = temp[2];
+  bytes[14] = temp[1];
+  bytes[15] = temp[0];
 }
 
 };  // namespace exdir

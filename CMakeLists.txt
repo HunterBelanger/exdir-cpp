@@ -29,7 +29,7 @@ set(EXDIR_SOURCE_FILES ${EXDIR_SOURCE_FILES}
   src/group.cpp
   src/raw.cpp
   src/file.cpp
-  src/array.cpp
+  src/ndarray.cpp
   src/npy.cpp
   src/dataset.cpp
 )
@@ -39,8 +39,7 @@ set(EXDIR_HEADER_FILES ${EXDIR_HEADER_FILES}
   include/exdir/group.hpp
   include/exdir/raw.hpp
   include/exdir/file.hpp
-  include/exdir/array.hpp
-  include/exdir/npy.hpp
+  include/exdir/ndarray.hpp
   include/exdir/dataset.hpp
   include/exdir/exdir.hpp
 )

@@ -1,7 +1,7 @@
 #ifndef EXDIR_FILE_H
 #define EXDIR_FILE_H
 
-#include <exdir/group.hpp>
+#include "group.hpp"
 
 namespace exdir {
 

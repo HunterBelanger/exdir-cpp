@@ -2,14 +2,8 @@
 
 namespace exdir {
 
-Dataset::Dataset(std::filesystem::path i_path)
-    : Object{i_path},
-      data_{nullptr},
-      shape_{},
-      n_elements_{0},
-      element_size_{0},
-      dtype_{DType::DOUBLE64},
-      c_contiguous_{true} {
+template<class T>
+Dataset<T>::Dataset(std::filesystem::path i_path) : Object{i_path} {
   if (!is_dataset()) {
     std::string mssg = path_.string() + " does not contain a Dataset object.";
     throw std::runtime_error(mssg);
@@ -22,7 +16,7 @@ Dataset::Dataset(std::filesystem::path i_path)
   }
 
   // Load data
-  load_data();
+  data = NDArray<T>::load(path_/"data.npy");
 
   // Get any raw folders in directory
   // Look at all members in file, check if folder
@@ -34,13 +28,13 @@ Dataset::Dataset(std::filesystem::path i_path)
   }
 }
 
-Dataset::~Dataset() {
-  if (data_) {
-    clear_data();
-  }
+template<class T>
+Dataset<T>::~Dataset() {
+  write();
 }
 
-void Dataset::create_raw(std::string name) {
+template<class T>
+Raw Dataset<T>::create_raw(std::string name) {
   // Make sure directory does not yet exists
   if (!std::filesystem::exists(path_ / name)) {
     // Make directory
@@ -62,32 +56,14 @@ void Dataset::create_raw(std::string name) {
         "The directory " + name + " already exists in " + path_.string();
     throw std::runtime_error(mssg);
   }
-}
 
-void Dataset::load_data() {
-  load_npy((path_ / "data.npy"), data_, shape_, dtype_, c_contiguous_);
-  element_size_ = size_of_DType(dtype_);
-}
-
-void Dataset::clear_data() {
-  n_elements_ = 0;
-  element_size_ = 0;
-  delete[] data_;
-  data_ = nullptr;
-}
-
-bool Dataset::data_loaded() const {
-  if (data_)
-    return true;
-  else
-    return false;
+  return get_raw(name);
 }
 
 template <class T>
-void Dataset::write(Array<T> data) {
-  write_npy(path_ / "data.npy",
-            reinterpret_cast<const char*>(data.data_pointer()), data.shape(),
-            data.dtype(), data.c_contiguous());
+void Dataset<T>::write() {
+  // Write data to npy file
+  data.save(path_/"data.npy"); 
 
   // Write attributes as well
   if (!attrs.IsNull()) {
@@ -97,9 +73,8 @@ void Dataset::write(Array<T> data) {
   }
 }
 
-DType Dataset::dtype() const {return dtype_;}
-
-Raw Dataset::get_raw(std::string name) const {
+template<class T>
+Raw Dataset<T>::get_raw(std::string name) const {
   // Make sure in raws_
   for (const auto& raw : raws_) {
     if (name == raw) {
@@ -112,6 +87,21 @@ Raw Dataset::get_raw(std::string name) const {
   throw std::runtime_error(mssg);
 }
 
-std::vector<std::string> Dataset::member_raws() const { return raws_; }
+template<class T>
+std::vector<std::string> Dataset<T>::member_raws() const { return raws_; }
 
 };  // namespace exdir
+
+// Explicit Instantiation
+template class exdir::Dataset<char>;
+template class exdir::Dataset<unsigned char>;
+template class exdir::Dataset<uint16_t>;
+template class exdir::Dataset<uint32_t>;
+template class exdir::Dataset<uint64_t>;
+template class exdir::Dataset<int16_t>;
+template class exdir::Dataset<int32_t>;
+template class exdir::Dataset<int64_t>;
+template class exdir::Dataset<float>;
+template class exdir::Dataset<double>;
+template class exdir::Dataset<std::complex<float>>;
+template class exdir::Dataset<std::complex<double>>;

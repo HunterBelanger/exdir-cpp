@@ -24,7 +24,9 @@ enum class DType {
   UINT32,
   UINT64,
   FLOAT32,
-  DOUBLE64
+  DOUBLE64,
+  COMPLEX64,
+  COMPLEX128
 };
 
 // Function which opens file fname, and loads in the binary data into 1D
@@ -63,6 +65,9 @@ void swap_four_bytes(char* bytes);
 
 // Swaps the first eight bytes pointed to by char* bytes.
 void swap_eight_bytes(char* bytes);
+
+// Swaps the first sixteen bytes pointed to by char* bytes.
+void swap_sixteen_bytes(char* bytes);
 
 };      // namespace exdir
 #endif  // EXDIR_NPY_H

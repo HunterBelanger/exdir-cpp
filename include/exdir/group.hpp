@@ -1,9 +1,9 @@
 #ifndef EXDIR_GROUP_H
 #define EXDIR_GROUP_H
 
-#include <exdir/dataset.hpp>
-#include <exdir/object.hpp>
-#include <exdir/raw.hpp>
+#include "dataset.hpp"
+#include "raw.hpp"
+#include "object.hpp"
 
 namespace exdir {
 
@@ -13,15 +13,15 @@ class Group : public Object {
   ~Group() = default;
 
   // Create a new group within the current group called <name>
-  void create_group(std::string name);
+  Group create_group(std::string name);
 
   // Create a new raw within the current group called <name>
-  void create_raw(std::string name);
+  exdir::Raw create_raw(std::string name);
 
   // Create a new dataset within the current group called name,
   // and with type T.
   template <class T>
-  void create_dataset(std::string name, const exdir::Array<T>& data) {
+  exdir::Dataset<T> create_dataset(std::string name, const exdir::NDArray<T>& data) {
     // Make sure directory does not yet exists
     if (!std::filesystem::exists(path_ / name)) {
       // Make directory
@@ -39,15 +39,15 @@ class Group : public Object {
       datasets_.push_back(name);
 
       // Write data to data.npy
-      write_npy(path_ / name / "data.npy",
-                reinterpret_cast<const char*>(data.data_pointer()),
-                data.shape(), data.dtype(), data.c_contiguous());
+      data.save(path_ / name / "data.npy");
 
     } else {
       std::string mssg =
           "The directory " + name + " already exists in " + path_.string();
       throw std::runtime_error(mssg);
     }
+
+    return get_dataset<T>(name);
   }
 
   // Retrieve the groupe called <name> from current group
@@ -57,7 +57,19 @@ class Group : public Object {
   exdir::Raw get_raw(std::string name) const;
 
   // Retrieve the groupe called <name> from current group
-  exdir::Dataset get_dataset(std::string name) const;
+  template<class T>
+  exdir::Dataset<T> get_dataset(std::string name) const {
+    // Make sure in datasets_
+    for (const auto& dset : datasets_) {
+      if (name == dset) {
+        return exdir::Dataset<T>(path_ / name);
+      }
+    }
+    // throw error, wasn't a valid Dataset
+    std::string mssg = "The Dataset " + name + " is not a member of this Group.";
+    throw std::runtime_error(mssg);
+  }
+
 
   // Get vector of keys for member groups
   std::vector<std::string> member_groups() const;

@@ -48,7 +48,7 @@ Group::Group(std::filesystem::path i_path) : Object{i_path} {
   }
 }
 
-void Group::create_group(std::string name) {
+Group Group::create_group(std::string name) {
   // Make sure directory does not yet exists
   if (!std::filesystem::exists(path_ / name)) {
     // Make directory
@@ -70,9 +70,11 @@ void Group::create_group(std::string name) {
         "The directory " + name + " already exists in " + path_.string();
     throw std::runtime_error(mssg);
   }
+
+  return get_group(name);
 }
 
-void Group::create_raw(std::string name) {
+Raw Group::create_raw(std::string name) {
   // Make sure directory does not yet exists
   if (!std::filesystem::exists(path_ / name)) {
     // Make directory
@@ -94,6 +96,8 @@ void Group::create_raw(std::string name) {
         "The directory " + name + " already exists in " + path_.string();
     throw std::runtime_error(mssg);
   }
+
+  return get_raw(name);
 }
 
 Group Group::get_group(std::string name) const {
@@ -106,18 +110,6 @@ Group Group::get_group(std::string name) const {
   // throw error, wasn't a valid group
   std::string mssg =
       "The group " + name + " is not a member of " + this->name() + ".";
-  throw std::runtime_error(mssg);
-}
-
-Dataset Group::get_dataset(std::string name) const {
-  // Make sure in datasets_
-  for (const auto& dset : datasets_) {
-    if (name == dset) {
-      return exdir::Dataset(path_ / name);
-    }
-  }
-  // throw error, wasn't a valid Dataset
-  std::string mssg = "The Dataset " + name + " is not a member of this Group.";
   throw std::runtime_error(mssg);
 }
 

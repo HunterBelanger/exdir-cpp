@@ -14,7 +14,7 @@ class Object {
  public:
   enum Type { File, Group, Dataset, Raw };
 
-  ~Object() = default;
+  ~Object() {write();}
 
   // Returns true if the object is a file.
   bool is_file() const;
@@ -41,7 +41,9 @@ class Object {
   bool operator==(const Object& obj) const;
 
   // Writes the attribues of object to disk.
-  void write();
+  // Must be virtual so that Dataset can overload it for
+  // writing the .npy data file
+  virtual void write();
 
   // YAML Node with attributes for object.
   YAML::Node attrs;

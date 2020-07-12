@@ -1,7 +1,7 @@
 #ifndef EXDIR_RAW_H
 #define EXDIR_RAW_H
 
-#include <exdir/object.hpp>
+#include "object.hpp"
 
 namespace exdir {
 
