@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(BUILD_STATIC_LIBS "BUild only static libs" OFF)
 option(BUILD_EXAMPLE "Build example executable" ON)
-option(BUILD_TESTS "Build unit tests" OFF)
 
 if(MSVC)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -69,13 +68,6 @@ if(BUILD_EXAMPLE)
     target_link_libraries(example PUBLIC exdir_shared)
   else()
     target_link_libraries(example PUBLIC exdir_static)
-  endif()
-endif()
-
-if(BUILD_TESTS)
-  find_package(GTest REQUIRED)
-  if(GTest_FOUND)
-    add_subdirectory(tests)
   endif()
 endif()
 
