@@ -52,19 +52,19 @@ int main() {
 A more in-depth explination of the classes and usage is given in the wiki 
 [here](https://github.com/HunterBelanger/exdir-cpp/wiki/Usage).
 
-# Dependencies
+## Dependencies
 This package is dependent on the [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 library, to handel all interactions with the ```.yaml``` file. It is present in
 most distro's repositories, and can usually be installed with your system's
 package manager.
 
-* Ubuntu / Linux Mint
+* **Ubuntu / Linux Mint :**
 ```sudo apt install libyaml-cpp-dev```
 
-* Fedora
+* **Fedora :**
 ```sudo dnf install yaml-cpp-devel```
 
-* Arch / Manjaro
+* **Arch / Manjaro :**
 ```sudo pacman -S yaml-cpp```
 
 ## Install
