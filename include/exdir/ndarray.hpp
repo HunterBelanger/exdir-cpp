@@ -489,7 +489,7 @@ template <class C>
 NDArray<T>& NDArray<T>::operator-=(C c) {
   // Do subtraction
   for (size_t i = 0; i < data_.size(); i++) {
-    data_[i] -= c.data_[i];
+    data_[i] -= c;
   }
 
   return *this;
