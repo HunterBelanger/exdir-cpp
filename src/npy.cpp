@@ -1,3 +1,14 @@
+/*
+ * exdir-cpp
+ *
+ * Copyright (C) 2020, Hunter Belanger (hunter.belanger@gmail.com)
+ * All rights reserved.
+ *
+ * Released under the terms and conditions of the BSD 3-Clause license.
+ * For more information, refer to the GitHub repo for this library at:
+ * https://github.com/HunterBelanger/exdir-cpp
+ *
+ * */
 #include "npy.hpp"
 
 namespace exdir {
@@ -24,7 +35,7 @@ void load_npy(std::filesystem::path fpath, char*& data_ptr,
   file.read(&major_verison, 1);
   file.read(&minor_version, 1);
 
-  uint32_t length_of_header;
+  uint32_t length_of_header = 0;
   // Do any version checks here if required
   if (major_verison == 0x01) {
     uint16_t length_temp = 0;

@@ -18,13 +18,6 @@ To learn more about Exdir the paper describing the specification can be found
 the reference implentation (written for Python) can be found 
 [here](https://github.com/CINPLA/exdir).
 
-## WARNING TO USERS
-This library has been made public, but is not quite ready for use yet. Users are 
-encouraged to take a look at it, and feel free to use it in your projects, but 
-understand that not all features have been implemented, and many things could 
-still change. Once this project reaches a more stable state, this warning will
-be removed.
-
 ## Usage
 Here is a brief example of exdir-cpp in action
 ```cpp
@@ -34,32 +27,45 @@ int main() {
 
   exdir::File file = exdir::create_file("test.exdir");
 
-  file.create_group("group1");
-
-  exdir::Group group1 = file.get_group("group1");
+  exdir::Group group1 = file.create_group("group1");
 
   std::vector<int> test_data { 1,  2,  3,  4,
                                5,  6,  7,  8,
                                9, 10, 11, 12,
                               13, 14, 15, 16};
 
-  exdir::Array test_array(test_data, {4,4}, exdir::DType::INT64);
+  exdir::NDArray test_array(test_data, {4,4});
 
   test_array.reshape({4,2,2});
 
-  group1.create_dataset("data_set_1", test_array);
-
-  exdir::Dataset dset_1 = group1.get_dataset("data_set_1");
+  exdir::Dataset dset_1 group1.create_dataset("data_set_1", test_array);
 
   dset_1.attrs["density"] = 12.4;
 
-  dset_1.write();
+  dset_1.data(0,0,0) = 17.;
+
+  dset_1.data.reshape({4,4});
 
   return 0;
 }
 ```
 A more in-depth explination of the classes and usage is given in the wiki 
 [here](https://github.com/HunterBelanger/exdir-cpp/wiki/Usage).
+
+# Dependencies
+This package is dependent on the [yaml-cpp](https://github.com/jbeder/yaml-cpp)
+library, to handel all interactions with the ```.yaml``` file. It is present in
+most distro's repositories, and can usually be installed with your system's
+package manager.
+
+* Ubuntu / Linux Mint
+```sudo apt install libyaml-cpp-dev```
+
+* Fedora
+```sudo dnf install yaml-cpp-devel```
+
+* Arch / Manjaro
+```sudo pacman -S yaml-cpp```
 
 ## Install
 All that is required to build exdir-cpp is a C++ compiler capable of the C++17
@@ -79,18 +85,7 @@ mkdir build && cd build
 cmake ..
 make -j
 ```
-This will build both static and shared libraries for both exdir-cpp and 
-yaml-cpp. These may be installed, allong with the header files for both
-programs by running ```make install```. The install directory may of course
-be specified with the usual ```-DCMAKE_INSTALL_PREFIX=/dir/to/install``` flag
-with the cmake command.
-
-## Notice
-This library uses yaml-cpp (version 0.6.3), which is already provided in the 
-vendor directory. The github repository for yaml-cpp is located 
-[here](https://github.com/jbeder/yaml-cpp). It is a great piece of software 
-which I recomend users take a look at. The only changes which have been made
-were a small change to the source in 
-```vendor\yaml-cpp\include\yaml-cpp\node\detail\node_iterator.h``` at line 56
-to comply with the C++17 standard (and to make Visual Studio warnings go away), 
-and the cmake, to simplify the build process.
+If you would like to install the library and header file to your system's
+default location, you may then run ```sudo make install``` after. You can
+also set the install location yourself by running cmake with the
+```-DCMAKE_INSTALL_PREFIX=/dir/to/install``` flag.

@@ -1,29 +1,19 @@
 cmake_minimum_required(VERSION 3.5)
-project(exdir CXX)
+project(exdir-cpp VERSION 0.0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(BUILD_STATIC_LIBS "BUild only static libs" OFF)
-option(BUILD_EXAMPLE "Build example executable" ON)
+include(CMakePackageConfigHelpers)
+include(CMakeDependentOption)
+include(CheckCXXCompilerFlag)
+include(GNUInstallDirs)
+include(CTest)
 
-if(MSVC)
-  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-  set(BUILD_STATIC OFF CACHE BOOL "Build static lib")
-  set(BUILD_SHARED ON CACHE BOOL "Build shared lib")
-elseif(BUILD_SHARED_LIBS)
-  set(BUILD_STATIC OFF CACHE BOOL "Build static lib")
-  set(BUILD_SHARED ON CACHE BOOL "Build shared lib")
-elseif(BUILD_STATIC_LIBS)
-  set(BUILD_STATIC ON CACHE BOOL "Build static lib")
-  set(BUILD_SHARED OFF CACHE BOOL "Build shared lib")
-else()
-  set(BUILD_STATIC ON CACHE BOOL "Build static lib")
-  set(BUILD_SHARED ON CACHE BOOL "Build shared lib") 
-endif()
+set(not-msvc $<NOT:$<CXX_COMPILER_ID:MSVC>>)
 
-include_directories(include vendor/yaml-cpp/include)
+include_directories(include)
 
-set(EXDIR_SOURCE_FILES ${EXDIR_SOURCE_FILES}
+set(EXDIR_CPP_SOURCE_FILES ${EXDIR_CPP_SOURCE_FILES}
   src/object.cpp
   src/group.cpp
   src/raw.cpp
@@ -33,68 +23,67 @@ set(EXDIR_SOURCE_FILES ${EXDIR_SOURCE_FILES}
   src/dataset.cpp
 )
 
-set(EXDIR_HEADER_FILES ${EXDIR_HEADER_FILES}
-  include/exdir/object.hpp
-  include/exdir/group.hpp
-  include/exdir/raw.hpp
-  include/exdir/file.hpp
-  include/exdir/ndarray.hpp
-  include/exdir/dataset.hpp
-  include/exdir/exdir.hpp
+set(exdir-cpp-lib-type STATIC)
+if(BUILD_SHARED_LIBS)
+  set(exdir-cpp-lib-type SHARED)
+endif()
+
+add_library(exdir-cpp ${exdir-cpp-lib-type} ${EXDIR_CPP_SOURCE_FILES})
+
+# Find and link with yaml-cpp
+find_package (yaml-cpp REQUIRED)
+include_directories(${YAML_CPP_INCLUDE_DIR})
+target_link_libraries (exdir-cpp ${YAML_CPP_LIBRARIES})
+
+target_compile_options(exdir-cpp
+  PRIVATE
+    $<${not-msvc}:-Wall -Wextra -Wshadow -Weffc++ -Wno-long-long>
+    $<${not-msvc}:-pedantic -pedantic-errors>
+    
+    $<$<CXX_COMPILER_ID:MSVC>:/W3 /wd4127 /wd4355>
 )
 
-add_library(exdir OBJECT ${EXDIR_SOURCE_FILES})
-set_target_properties(exdir PROPERTIES PUBLIC_HEADER "${EXDIR_HEADER_FILES}")
+set_target_properties(exdir-cpp PROPERTIES
+  VERSION "${PROJECT_VERSION}"
+  SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
+  PROJECT_LABEL "exdir-cpp"
+)
 
-set_property(TARGET exdir PROPERTY POSITION_INDEPENDENT_CODE 1)
+configure_package_config_file(
+  "${PROJECT_SOURCE_DIR}/exdir-cpp-config.cmake.in"
+  "${PROJECT_BINARY_DIR}/exdir-cpp-config.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/exdir-cpp"
+)
 
-add_subdirectory(vendor/yaml-cpp)
+write_basic_package_version_file(
+  "${PROJECT_BINARY_DIR}/exdir-cpp-config-version.cmake"
+  COMPATIBILITY AnyNewerVersion
+)
 
-if(BUILD_SHARED)
-  add_library(exdir_shared SHARED $<TARGET_OBJECTS:exdir>)
-  target_link_libraries(exdir_shared PUBLIC yaml-cpp_shared)
-  set_target_properties(exdir_shared PROPERTIES OUTPUT_NAME exdir)
-endif()
+configure_file(exdir-cpp.pc.in exdir-cpp.pc @ONLY)
 
-if(BUILD_STATIC)
-  add_library(exdir_static STATIC $<TARGET_OBJECTS:exdir>)
-  target_link_libraries(exdir_static PUBLIC yaml-cpp_static)
-  set_target_properties(exdir_static PROPERTIES OUTPUT_NAME exdir)
-endif()
+install(TARGETS exdir-cpp
+    EXPORT exdir-cpp-targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
 
-if(BUILD_EXAMPLE)
-  add_executable(example example/main.cpp)
-  if(BUILD_SHARED)
-    target_link_libraries(example PUBLIC exdir_shared)
-  else()
-    target_link_libraries(example PUBLIC exdir_static)
-  endif()
-endif()
-
-if(NOT MSVC)
-  if(BUILD_SHARED)
-    install(TARGETS exdir_shared
-            LIBRARY
-              DESTINATION lib
-              COMPONENT Libraries
-              NAMELINK_COMPONENT Development
-            PUBLIC_HEADER
-              DESTINATION include
-              COMPONENT Development
-    )
-  endif()
-
-  if(BUILD_STATIC)
-    install(TARGETS exdir_static
-            LIBRARY
-              DESTINATION lib
-              COMPONENT Libraries
-              NAMELINK_COMPONENT Development
-            PUBLIC_HEADER
-              DESTINATION include
-              COMPONENT Development
-    )
-  endif()
-
-  install(DIRECTORY "include/exdir" DESTINATION include)
-endif()
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+		FILES_MATCHING PATTERN "*.hpp"
+)
+  
+install(EXPORT exdir-cpp-targets
+    DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/exdir-cpp"
+)
+	
+install(FILES
+		"${PROJECT_BINARY_DIR}/exdir-cpp-config.cmake"
+		"${PROJECT_BINARY_DIR}/exdir-cpp-config-version.cmake"
+    DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/exdir-cpp"
+)
+  
+install(FILES "${PROJECT_BINARY_DIR}/exdir-cpp.pc"
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/pkgconfig
+)

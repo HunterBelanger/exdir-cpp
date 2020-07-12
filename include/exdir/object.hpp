@@ -1,3 +1,14 @@
+/*
+ * exdir-cpp
+ *
+ * Copyright (C) 2020, Hunter Belanger (hunter.belanger@gmail.com)
+ * All rights reserved.
+ *
+ * Released under the terms and conditions of the BSD 3-Clause license.
+ * For more information, refer to the GitHub repo for this library at:
+ * https://github.com/HunterBelanger/exdir-cpp
+ *
+ * */
 #ifndef EXDIR_OBJECT_H
 #define EXDIR_OBJECT_H
 
@@ -14,7 +25,7 @@ class Object {
  public:
   enum Type { File, Group, Dataset, Raw };
 
-  ~Object() {write();}
+  virtual ~Object() {write();}
 
   // Returns true if the object is a file.
   bool is_file() const;
