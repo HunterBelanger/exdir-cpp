@@ -13,7 +13,7 @@
 
 namespace exdir {
 
-File::File(std::filesystem::path i_path) : Group{i_path} {
+File::File(std::filesystem::path i_path) : Group(i_path) {
   // Use is_file() to make sure a File object was loaded.
   if (!is_file()) {
     std::string mssg = path_.string() + " does not contain a File object.";

@@ -28,28 +28,40 @@ class Object {
   virtual ~Object() {write();}
 
   // Returns true if the object is a file.
-  bool is_file() const;
+  bool is_file() const {
+    return type_ == Type::File ? true : false;
+  }
 
   // Returns true if the object is a group or a file.
-  bool is_group() const;
+  bool is_group() const {
+    return (type_ == Type::Group) || (type_ == Type::File) ? true : false;
+  }
 
   // Returns true if the object is a dataset.
-  bool is_dataset() const;
+  bool is_dataset() const {
+    return type_ == Type::Dataset ? true : false; 
+  }
 
   // Returns true if the object is a raw.
-  bool is_raw() const;
+  bool is_raw() const {
+    return type_ == Type::Raw ? true : false; 
+  }
 
   // Returnes true if the object has attributes already defined.
-  bool has_attributes() const;
+  bool has_attributes() const {
+    return !attrs.IsNull(); 
+  }
 
   // Returns the name of the object as a string.
-  std::string name() const;
+  const std::string& name() const { return name_; }
 
   // Returns the std::filesystem::path to the object from the root.
-  std::filesystem::path path() const;
+  const std::filesystem::path& path() const { return path_; }
 
   // Returns true if the two objects have the same path.
-  bool operator==(const Object& obj) const;
+  bool operator==(const Object& obj) const {
+    return (path_.relative_path() == obj.path().relative_path());
+  }
 
   // Writes the attribues of object to disk.
   // Must be virtual so that Dataset can overload it for
@@ -63,6 +75,7 @@ class Object {
   Object(std::filesystem::path i_path);
   Type type_;
   std::filesystem::path path_;
+  std::string name_;
   // Exidr info stored in a yaml node
   YAML::Node exdir_info;
 

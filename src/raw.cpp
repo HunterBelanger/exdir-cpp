@@ -13,7 +13,7 @@
 
 namespace exdir {
 
-Raw::Raw(std::filesystem::path i_path) : Object{i_path} {
+Raw::Raw(std::filesystem::path i_path) : Object(i_path) {
   // use is_raw() to make sure a Raw object was loaded
   if (!is_raw()) {
     std::string mssg = path_.string() + " does not contian a Raw object.";

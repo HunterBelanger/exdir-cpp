@@ -13,7 +13,7 @@
 
 namespace exdir {
 
-Group::Group(std::filesystem::path i_path) : Object{i_path} {
+Group::Group(std::filesystem::path i_path) : Object(i_path), groups_(), raws_(), datasets_() {
   // use is_group() and is_file() to make sure group object was loaded.
   if (!is_group()) {
     std::string mssg = path_.string() + " does not contain a Group object.";
@@ -59,7 +59,7 @@ Group::Group(std::filesystem::path i_path) : Object{i_path} {
   }
 }
 
-Group Group::create_group(std::string name) {
+Group Group::create_group(const std::string& name) {
   // Make sure directory does not yet exists
   if (!std::filesystem::exists(path_ / name)) {
     // Make directory
@@ -85,7 +85,7 @@ Group Group::create_group(std::string name) {
   return get_group(name);
 }
 
-Raw Group::create_raw(std::string name) {
+Raw Group::create_raw(const std::string& name) {
   // Make sure directory does not yet exists
   if (!std::filesystem::exists(path_ / name)) {
     // Make directory
@@ -111,7 +111,7 @@ Raw Group::create_raw(std::string name) {
   return get_raw(name);
 }
 
-Group Group::get_group(std::string name) const {
+Group Group::get_group(const std::string& name) const {
   // Make sure in groups_
   for (const auto& group : groups_) {
     if (name == group) {
@@ -124,7 +124,7 @@ Group Group::get_group(std::string name) const {
   throw std::runtime_error(mssg);
 }
 
-Raw Group::get_raw(std::string name) const {
+Raw Group::get_raw(const std::string& name) const {
   // Make sure in raws_
   for (const auto& raw : raws_) {
     if (name == raw) {
@@ -136,11 +136,5 @@ Raw Group::get_raw(std::string name) const {
       "The raw " + name + " is not a member of " + this->name() + ".";
   throw std::runtime_error(mssg);
 }
-
-std::vector<std::string> Group::member_groups() const { return groups_; }
-
-std::vector<std::string> Group::member_datasets() const { return datasets_; }
-
-std::vector<std::string> Group::member_raws() const { return raws_; }
 
 };  // namespace exdir

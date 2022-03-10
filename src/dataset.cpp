@@ -14,7 +14,7 @@
 namespace exdir {
 
 template<class T>
-Dataset<T>::Dataset(std::filesystem::path i_path) : Object{i_path} {
+Dataset<T>::Dataset(std::filesystem::path i_path) : Object(i_path), data(), raws_() {
   if (!is_dataset()) {
     std::string mssg = path_.string() + " does not contain a Dataset object.";
     throw std::runtime_error(mssg);
@@ -40,12 +40,7 @@ Dataset<T>::Dataset(std::filesystem::path i_path) : Object{i_path} {
 }
 
 template<class T>
-Dataset<T>::~Dataset() {
-  write();
-}
-
-template<class T>
-Raw Dataset<T>::create_raw(std::string name) {
+Raw Dataset<T>::create_raw(const std::string& name) {
   // Make sure directory does not yet exists
   if (!std::filesystem::exists(path_ / name)) {
     // Make directory
@@ -71,21 +66,8 @@ Raw Dataset<T>::create_raw(std::string name) {
   return get_raw(name);
 }
 
-template <class T>
-void Dataset<T>::write() {
-  // Write data to npy file
-  data.save(path_/"data.npy"); 
-
-  // Write attributes as well
-  if (!attrs.IsNull()) {
-    std::ofstream attributes_yaml(path_ / "attributes.yaml");
-    attributes_yaml << attrs;
-    attributes_yaml.close();
-  }
-}
-
 template<class T>
-Raw Dataset<T>::get_raw(std::string name) const {
+Raw Dataset<T>::get_raw(const std::string& name) const {
   // Make sure in raws_
   for (const auto& raw : raws_) {
     if (name == raw) {
@@ -98,8 +80,18 @@ Raw Dataset<T>::get_raw(std::string name) const {
   throw std::runtime_error(mssg);
 }
 
-template<class T>
-std::vector<std::string> Dataset<T>::member_raws() const { return raws_; }
+template <class T>
+void Dataset<T>::write() {
+  // Write data to npy file
+  data.save(path_/"data.npy"); 
+
+  // Write attributes as well
+  if (!attrs.IsNull()) {
+    std::ofstream attributes_yaml(path_ / "attributes.yaml");
+    attributes_yaml << attrs;
+    attributes_yaml.close();
+  }
+}
 
 };  // namespace exdir
 

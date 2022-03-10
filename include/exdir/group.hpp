@@ -12,27 +12,26 @@
 #ifndef EXDIR_GROUP_H
 #define EXDIR_GROUP_H
 
-#include "dataset.hpp"
-#include "raw.hpp"
-#include "object.hpp"
+#include <exdir/dataset.hpp>
+#include <exdir/raw.hpp>
+#include <exdir/object.hpp>
 
 namespace exdir {
 
 class Group : public Object {
  public:
-  Group(std::filesystem::path i_path);
   ~Group() = default;
 
   // Create a new group within the current group called <name>
-  Group create_group(std::string name);
+  Group create_group(const std::string& name);
 
   // Create a new raw within the current group called <name>
-  exdir::Raw create_raw(std::string name);
+  exdir::Raw create_raw(const std::string& name);
 
   // Create a new dataset within the current group called name,
   // and with type T.
   template <class T>
-  exdir::Dataset<T> create_dataset(std::string name, const exdir::NDArray<T>& data) {
+  exdir::Dataset<T> create_dataset(const std::string& name, const exdir::NDArray<T>& data) {
     // Make sure directory does not yet exists
     if (!std::filesystem::exists(path_ / name)) {
       // Make directory
@@ -62,14 +61,14 @@ class Group : public Object {
   }
 
   // Retrieve the groupe called <name> from current group
-  Group get_group(std::string name) const;
+  Group get_group(const std::string& name) const;
 
   // Retrieve the groupe called <name> from current group
-  exdir::Raw get_raw(std::string name) const;
+  exdir::Raw get_raw(const std::string& name) const;
 
   // Retrieve the groupe called <name> from current group
   template<class T>
-  exdir::Dataset<T> get_dataset(std::string name) const {
+  exdir::Dataset<T> get_dataset(const std::string& name) const {
     // Make sure in datasets_
     for (const auto& dset : datasets_) {
       if (name == dset) {
@@ -83,19 +82,22 @@ class Group : public Object {
 
 
   // Get vector of keys for member groups
-  std::vector<std::string> member_groups() const;
+  const std::vector<std::string>& member_groups() const {return groups_;}
 
   // Get vector of keys for member dataset
-  std::vector<std::string> member_datasets() const;
+  const std::vector<std::string>& member_datasets() const {return datasets_;}
 
   // Get vector of keys for member raws
-  std::vector<std::string> member_raws() const;
+  const std::vector<std::string>& member_raws() const {return raws_;}
 
  protected:
+  // Constructor is private.
+  // Only a File or another Group can create an new group.
+  Group(std::filesystem::path i_path);
+
   std::vector<std::string> groups_;
   std::vector<std::string> raws_;
   std::vector<std::string> datasets_;
-
 };  // Group
 
 };      // namespace exdir

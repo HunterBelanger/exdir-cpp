@@ -13,7 +13,7 @@
 
 namespace exdir {
 
-Object::Object(std::filesystem::path i_path) : path_{i_path} {
+Object::Object(std::filesystem::path i_path) : attrs(), type_(Type::Raw), path_(i_path), name_(), exdir_info() {
   // Check if exdir.yaml exists, if so, load into exdir_info
   if (std::filesystem::exists(path_ / "exdir.yaml")) {
     exdir_info = YAML::LoadFile((path_ / "exdir.yaml").string());
@@ -38,53 +38,13 @@ Object::Object(std::filesystem::path i_path) : path_{i_path} {
     type_ = Type::Raw;
   }
 
+  // Set name from path
+  name_ = path_.filename().string();
+
   // Check if attributes.yaml exists. If so, load into attributes
   if (std::filesystem::exists(path_ / "attributes.yaml")) {
     attrs = YAML::LoadFile((path_ / "attributes.yaml").string());
   }
-}
-
-bool Object::is_file() const {
-  if (type_ == Type::File)
-    return true;
-  else
-    return false;
-}
-
-bool Object::is_group() const {
-  if (type_ == Type::Group || type_ == Type::File)
-    return true;
-  else
-    return false;
-}
-
-bool Object::is_dataset() const {
-  if (type_ == Type::Dataset)
-    return true;
-  else
-    return false;
-}
-
-bool Object::is_raw() const {
-  if (type_ == Type::Raw)
-    return true;
-  else
-    return false;
-}
-
-bool Object::has_attributes() const {
-  if (attrs.IsNull())
-    return false;
-  else
-    return true;
-}
-
-std::string Object::name() const { return path_.filename().string(); }
-
-std::filesystem::path Object::path() const { return path_; }
-
-bool Object::operator==(const Object& obj) const {
-  return (path_.relative_path() == obj.path().relative_path());
 }
 
 void Object::write() {

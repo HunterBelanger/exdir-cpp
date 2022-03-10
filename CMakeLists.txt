@@ -1,26 +1,38 @@
-cmake_minimum_required(VERSION 3.12)
-project(exdir-cpp VERSION 0.0.1 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.11)
+
+project(exdir-cpp
+  VERSION 0.0.1
+  LANGUAGES CXX
+)
 
 include(CheckCXXCompilerFlag)
+include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
+include(FetchContent)
+
+option(EXDIR_CPP_SHARED "Build Exdir-CPP as a shared library" OFF)
+option(EXDIR_CPP_INSTALL "Install the Exdir-CPP library and header files" ON)
 
 set(EXDIR_CPP_SOURCE_FILES ${EXDIR_CPP_SOURCE_FILES}
   src/object.cpp
   src/group.cpp
   src/raw.cpp
   src/file.cpp
-  src/ndarray.cpp
-  src/npy.cpp
   src/dataset.cpp
 )
 
-# Add shared library target. Must be shared due to dependence on yaml-cpp.
-# I am not completely sure why though.
-add_library(exdir-cpp SHARED ${EXDIR_CPP_SOURCE_FILES})
+if (EXDIR_CPP_SHARED)
+  add_library(exdir-cpp SHARED ${EXDIR_CPP_SOURCE_FILES})
+else()
+  add_library(exdir-cpp STATIC ${EXDIR_CPP_SOURCE_FILES})
+endif()
+
+# Add alias to make more friendly with FetchConent
+add_library(Exdir::exdir-cpp ALIAS exdir-cpp)
 
 # Find and link with yaml-cpp
 find_package (yaml-cpp REQUIRED)
-target_link_libraries(exdir-cpp PUBLIC ${YAML_CPP_LIBRARIES})
+target_link_libraries(exdir-cpp PUBLIC yaml-cpp)
 
 target_include_directories(exdir-cpp
   PUBLIC
@@ -37,10 +49,7 @@ target_compile_options(exdir-cpp
     $<$<CXX_COMPILER_ID:MSVC>:/W3 /wd4127 /wd4355>
 )
 
-target_compile_features(exdir-cpp
-  PUBLIC
-    cxx_std_17  
-)
+target_compile_features(exdir-cpp PUBLIC cxx_std_17)
 
 set_target_properties(exdir-cpp PROPERTIES
   VERSION "${PROJECT_VERSION}"
@@ -48,14 +57,39 @@ set_target_properties(exdir-cpp PROPERTIES
   PROJECT_LABEL "exdir-cpp"
 )
 
-install(TARGETS exdir-cpp
-    EXPORT exdir-cpp-targets
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
+if(EXDIR_CPP_INSTALL)
+  configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/exdir-cppConfig.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/exdir-cppConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/exdir-cpp
+  )
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-		FILES_MATCHING PATTERN "*.hpp"
-)
+  write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/exdir-cppConfigVersion.cmake"
+    VERSION "${exdir-cpp_VERSION}"
+    COMPATIBILITY SameMinorVersion
+  )
+
+  install(TARGETS exdir-cpp
+          EXPORT exdir-cppTargets
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+          INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  )
+
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/exdir
+          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+         )
+
+  install(EXPORT exdir-cppTargets
+          FILE exdir-cppTargets.cmake
+          NAMESPACE Exdir::
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/exdir-cpp
+  )
+
+  install(FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/exdir-cppConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/exdir-cppConfigVersion.cmake"
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/exdir-cpp
+  )
+endif()

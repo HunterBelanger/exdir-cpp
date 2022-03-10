@@ -12,7 +12,7 @@
 #ifndef EXDIR_RAW_H
 #define EXDIR_RAW_H
 
-#include "object.hpp"
+#include <exdir/object.hpp>
 
 namespace exdir {
 
@@ -25,7 +25,6 @@ class Raw : public Object {
   // therefore a list of the members is provided. They are not
   // probed in any way however.
   std::vector<std::string> member_files() const;
-
 };  // Raw
 
 };      // namespace exdir

@@ -12,11 +12,11 @@
 #ifndef EXDIR_H
 #define EXDIR_H
 
-#include "ndarray.hpp"
-#include "dataset.hpp"
-#include "file.hpp"
-#include "group.hpp"
-#include "object.hpp"
-#include "raw.hpp"
+#include <exdir/ndarray.hpp>
+#include <exdir/dataset.hpp>
+#include <exdir/file.hpp>
+#include <exdir/group.hpp>
+#include <exdir/object.hpp>
+#include <exdir/raw.hpp>
 
 #endif  // EXDIR_H
