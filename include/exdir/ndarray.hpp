@@ -836,7 +836,7 @@ inline void load_npy(std::string fname, char*& data_ptr,
                      std::vector<size_t>& shape, DType& dtype,
                      bool& c_contiguous) {
   // Open file
-  std::ifstream file(fname);
+  std::ifstream file(fname, std::ios::binary);
 
   // Read magic string
   char* magic_string = new char[6];
@@ -984,7 +984,7 @@ inline void write_npy(std::string fname, const char* data_ptr,
   }
 
   // Open file
-  std::ofstream file(fname);
+  std::ofstream file(fname, std::ios::binary);
 
   // First write magic string
   file << '\x93' << 'N' << 'U' << 'M' << 'P' << 'Y';
