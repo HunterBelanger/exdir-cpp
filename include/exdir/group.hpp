@@ -49,7 +49,7 @@ class Group : public Object {
       datasets_.push_back(name);
 
       // Write data to data.npy
-      data.save(path_ / name / "data.npy");
+      data.save((path_ / name / "data.npy").string());
 
     } else {
       std::string mssg =

@@ -27,7 +27,7 @@ Dataset<T>::Dataset(std::filesystem::path i_path) : Object(i_path), data(), raws
   }
 
   // Load data
-  data = NDArray<T>::load(path_/"data.npy");
+  data = NDArray<T>::load((path_/"data.npy").string());
 
   // Get any raw folders in directory
   // Look at all members in file, check if folder
@@ -83,7 +83,7 @@ Raw Dataset<T>::get_raw(const std::string& name) const {
 template <class T>
 void Dataset<T>::write() {
   // Write data to npy file
-  data.save(path_/"data.npy"); 
+  data.save((path_/"data.npy").string()); 
 
   // Write attributes as well
   if (!attrs.IsNull()) {
